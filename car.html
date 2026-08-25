@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Авто — АвтоСпільнота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .car-icon-lg {
+    font-size: 22px !important;
+  }
+
+  .entry-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+
+  #entryTags {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER (той самий, що на інших сторінках) -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
+    АвтоСпільнота
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">Питання</a>
+    <a href="garage.html">Гараж</a>
+    <a href="masters.html">Майстри</a>
+    <a href="forum.html">Форум</a>
+  </nav>
+  <div class="header-actions">
+    <div class="profile-menu">
+      <button class="btn-ghost" id="authTriggerBtn"><i class="ti ti-user"></i> Увійти</button>
+      <div class="profile-dropdown" id="profileDropdown"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
+  </div>
+</header>
+
+<div class="layout" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 760px; margin: 0 auto; width: 100%;">
+
+    <a href="garage.html" style="font-size:13px; color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-bottom:4px;">
+      <i class="ti ti-arrow-left"></i> Назад до гаража
+    </a>
+
+    <!-- Картка авто -->
+    <div class="q-card" style="cursor:default;">
+      <div class="q-top">
+        <div class="avatar av-blue" id="carAvatar"><i class="ti ti-car car-icon-lg"></i></div>
+        <div class="q-body">
+          <div class="q-title" id="carTitle" style="white-space:normal; font-size:18px;">Завантаження...</div>
+          <div class="q-meta" id="carMeta"></div>
+          <div class="q-tags" id="carTags"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Записи бортжурналу -->
+    <div class="main-header">
+      <span class="main-title">Бортжурнал (<span id="entriesCount">0</span>)</span>
+    </div>
+
+    <div id="entriesList" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+    <!-- Форма нового запису (тільки для власника) -->
+    <div class="ask-box" id="addEntryBox" style="display:none;">
+      <div class="ask-box-title">
+        <i class="ti ti-notes" style="font-size:15px;"></i>
+        Новий запис
+      </div>
+      <input type="text" id="entryTitle" placeholder="Заголовок (наприклад, Замінив ГРМ)" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-family:'Manrope', sans-serif; background:var(--bg); color:var(--text); outline:none;">
+      <textarea id="entryText" placeholder="Опишіть, що зробили..."></textarea>
+      <input type="text" id="entryTags" placeholder="Теги через кому (наприклад: ремонт, грм)">
+      <div class="ask-footer">
+        <button class="btn-red" id="entrySubmit" style="margin-left:auto;">
+          <i class="ti ti-send"></i> Додати запис
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Модалка авторизації (та сама, копія з index.html) -->
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="authModalTitle">Увійти в акаунт</h3>
+      <button class="modal-close" id="closeAuthModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Увійти</button>
+        <button class="auth-tab" data-tab="register">Реєстрація</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email адреса" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="button" class="btn-red" id="loginBtn">Увійти</button>
+      </form>
+      <form id="registerForm" style="display: none;">
+        <input type="text" id="registerName" placeholder="Ім'я та Прізвище" required>
+        <input type="email" id="registerEmail" placeholder="Email адреса" required>
+        <input type="password" id="registerPassword" placeholder="Придумайте пароль" required>
+        <button type="button" class="btn-red" id="registerBtn">Зареєструватися</button>
+      </form>
+      <div class="auth-footer">
+        <span id="authHelpText">Немає акаунту?</span>
+        <a href="#" id="switchLink">Зареєструватися</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="car.js"></script>
+</body>
+</html>

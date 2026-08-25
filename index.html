@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>АвтоСпільнота — допомога автомобілістам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .chat-panel {
+    height: calc(100vh - 56px) !important;
+    max-height: none !important;
+    min-height: calc(100vh - 56px) !important;
+    position: sticky !important;
+    top: 56px !important;
+    align-self: start !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="hamburger-btn" id="hamburgerBtn"><i class="ti ti-menu-2"></i></button>
+  <a href="#" class="logo">
+    <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
+    АвтоСпільнота
+  </a>
+  <nav class="header-nav">
+    <a href="#" class="active">Питання</a>
+    <a href="garage.html">Гараж</a>
+    <a href="masters.html">Майстри</a>
+    <a href="forum.html">Форум</a>
+  </nav>
+<div class="header-search">
+    <i class="ti ti-search"></i>
+    <input type="text" id="searchInput" placeholder="Пошук по питаннях...">
+  </div>
+  <div class="header-actions">
+    <div class="profile-menu">
+      <button class="btn-ghost" id="authTriggerBtn"><i class="ti ti-user"></i> Увійти</button>
+      <div class="profile-dropdown" id="profileDropdown"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
+        <button class="btn-red"><i class="ti ti-plus"></i> Задати питання</button>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Категорії</div>
+ <a href="#" class="sidebar-item active" data-category=""><i class="ti ti-layout-grid"></i> Всі питання</a>
+    <a href="#" class="sidebar-item" data-category="Двигун"><i class="ti ti-engine"></i> Двигун</a>
+    <a href="#" class="sidebar-item" data-category="Кузов та підвіска"><i class="ti ti-car"></i> Кузов та підвіска</a>
+    <a href="#" class="sidebar-item" data-category="Електрика"><i class="ti ti-bolt"></i> Електрика</a>
+    <a href="#" class="sidebar-item" data-category="Клімат"><i class="ti ti-snowflake"></i> Клімат</a>
+    <a href="#" class="sidebar-item" data-category="Паливна система"><i class="ti ti-gas-station"></i> Паливна система</a>
+    <a href="#" class="sidebar-item" data-category="АКПП / КПП"><i class="ti ti-settings-2"></i> АКПП / КПП</a>
+    <a href="#" class="sidebar-item" data-category="ТО і обслуговування"><i class="ti ti-tool"></i> ТО і обслуговування</a>
+    <a href="#" class="sidebar-item" data-category="Документи / право"><i class="ti ti-certificate"></i> Документи / право</a>
+  </div>
+
+  <!-- === ЗМІНЕНО === -->
+<div class="sidebar-section" id="myActivitySection">
+    <div class="sidebar-label">Моя активність</div>
+    <a href="profile.html?tab=questions" class="sidebar-item"><i class="ti ti-help-circle"></i> Мої питання <span class="count" id="myQuestionsCount">0</span></a>
+    <a href="profile.html?tab=answers" class="sidebar-item"><i class="ti ti-message-circle"></i> Мої відповіді <span class="count" id="myAnswersCount">0</span></a>
+    <a href="#" class="sidebar-item"><i class="ti ti-bookmark"></i> Збережене</a>
+  </div>
+</aside>
+
+  <!-- Основні-->
+  <main class="main">
+
+    <!-- Статистика -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon red"><i class="ti ti-help-circle"></i></div>
+        <div>
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Питань всього</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="ti ti-check"></i></div>
+        <div>
+          <div class="stat-num" id="statSolved">0%</div>
+          <div class="stat-label">Вирішено</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="ti ti-users"></i></div>
+        <div>
+          <div class="stat-num" id="statUsers">0</div>
+          <div class="stat-label">Учасників</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ask box -->
+    <div class="ask-box">
+      <div class="ask-box-title">
+        <i class="ti ti-pencil" style="font-size:15px;"></i>
+        Є питання? Спитай спільноту!
+      </div>
+      <textarea id="askBoxText" placeholder="Опишіть проблему детально — марка, модель, рік, що трапилось."></textarea>
+      <div class="ask-footer">
+        <select id="askBoxCategory">
+          <option value="">Оберіть категорію</option>
+          <option>Двигун</option>
+          <option>Кузов та підвіска</option>
+          <option>Електрика</option>
+          <option>Клімат</option>
+          <option>Паливна система</option>
+          <option>АКПП / КПП</option>
+          <option>ТО і обслуговування</option>
+        </select>
+        <button class="btn-red" id="askBoxSubmit"><i class="ti ti-send"></i> Запитати</button>
+      </div>
+    </div>
+
+<!-- MODAL: Нове питання -->
+<div class="modal" id="newQuestionModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Задати нове питання</h3>
+      <button class="modal-close" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="modalQuestionText" rows="5" placeholder="Опишіть проблему детально: марка, модель, рік, що саме трапилось, що вже пробували..."></textarea>
+      
+      <select id="modalCategory">
+        <option value="">Оберіть категорію</option>
+        <option value="Двигун">Двигун</option>
+        <option value="Кузов та підвіска">Кузов та підвіска</option>
+        <option value="Електрика">Електрика</option>
+        <option value="Клімат">Клімат</option>
+        <option value="Паливна система">Паливна система</option>
+        <option value="АКПП / КПП">АКПП / КПП</option>
+        <option value="ТО і обслуговування">ТО і обслуговування</option>
+        <option value="Документи / право">Документи / право</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+  <button class="btn-red" id="submitNewQuestion">
+    <i class="ti ti-send"></i> Опублікувати 
+  </button>
+</div>
+  </div>
+</div>
+
+<!-- MODAL: Авторизація / Реєстрація -->
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="authModalTitle">Увійти в акаунт</h3>
+      <button class="modal-close" id="closeAuthModal">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Увійти</button>
+        <button class="auth-tab" data-tab="register">Реєстрація</button>
+      </div>
+
+      <!-- Форма входу -->
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email адреса" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="button" class="btn-red" id="loginBtn">Увійти</button>
+      </form>
+
+      <!-- Форма реєстрації -->
+      <form id="registerForm" style="display: none;">
+        <input type="text" id="registerName" placeholder="Ім'я та Прізвище" required>
+        <input type="email" id="registerEmail" placeholder="Email адреса" required>
+        <input type="password" id="registerPassword" placeholder="Придумайте пароль" required>
+        <button type="button" class="btn-red" id="registerBtn">Зареєструватися</button>
+      </form>
+
+      <div class="auth-footer">
+        <span id="authHelpText">Немає акаунту?</span> 
+        <a href="#" id="switchLink">Зареєструватися</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <!-- Filters -->
+    <div class="main-header">
+      <span class="main-title">Останні питання</span>
+      <div class="filters">
+        <button class="filter-btn active">Нові</button>
+        <button class="filter-btn">Гарячі</button>
+        <button class="filter-btn">Без відповіді</button>
+        <button class="filter-btn">Вирішені</button>
+      </div>
+    </div>
+
+   <!-- Question cards -->
+    <div class="questions-list" id="questionsList">
+    </div>
+
+  </main>
+
+  <!-- CHAT PANEL -->
+  <aside class="chat-panel">
+    <div class="chat-head">
+      <i class="ti ti-messages" style="font-size:17px; color:var(--red);"></i>
+      Онлайн-чат
+      <div class="online-count">
+        <div class="online-dot"></div>
+        12 онлайн
+      </div>
+      <button class="chat-sheet-close" id="chatSheetClose"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg-wrap">
+        <div class="msg-author">Сергій В.</div>
+        <div class="msg-bubble">Хлопці, хто знає де у Вінниці нормально роблять АКПП?</div>
+      </div>
+      <div class="msg-wrap">
+        <div class="msg-author">Андрій М.</div>
+        <div class="msg-bubble">Спробуй на вул. Пирогова, там Василь майстер — золоті руки 👍</div>
+      </div>
+      <div class="msg-wrap">
+        <div class="msg-author">Ігор Д.</div>
+        <div class="msg-bubble">+1 до Василя, сам у нього робив минулого року</div>
+      </div>
+      <div class="msg-wrap me">
+        <div class="msg-author" style="text-align:right;">Ви</div>
+        <div class="msg-bubble">Дякую, запишусь!</div>
+      </div>
+      <div class="msg-wrap">
+        <div class="msg-author">Олена Г.</div>
+        <div class="msg-bubble">А хто знає норму тиску в шинах для Skoda Octavia A7?</div>
+      </div>
+      <div class="msg-wrap">
+        <div class="msg-author">Роман К.</div>
+        <div class="msg-bubble">Спереду 2.2 бар, ззаду 2.0 для літніх. Зимою +0.2</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input 
+      type="text"
+      id="chatInput"
+      placeholder="Написати повідомлення..." 
+      onkeydown="if(event.key === 'Enter') sendMessage()">
+      <button class="chat-send" onclick="sendMessage()">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </aside>
+
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Питання — АвтоСпільнота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER (той самий, що на головній) -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
+    АвтоСпільнота
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">Питання</a>
+    <a href="garage.html">Гараж</a>
+    <a href="masters.html">Майстри</a>
+    <a href="forum.html">Форум</a>
+  </nav>
+  <div class="header-actions">
+    <div class="profile-menu">
+      <button class="btn-ghost" id="authTriggerBtn"><i class="ti ti-user"></i> Увійти</button>
+      <div class="profile-dropdown" id="profileDropdown"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
+      </div>
+</header>
+
+<div class="layout" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 720px; margin: 0 auto; width: 100%;">
+
+    <a href="index.html" style="font-size:13px; color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-bottom:4px;">
+      <i class="ti ti-arrow-left"></i> Назад до питань
+    </a>
+
+    <!-- Саме питання -->
+    <div class="q-card" style="cursor:default;">
+      <div class="q-top">
+        <div class="avatar av-blue" id="qAvatar">??</div>
+        <div class="q-body">
+          <div class="q-title" id="qTitle" style="white-space:normal; font-size:18px;">Завантаження...</div>
+          <div class="q-meta" id="qMeta"></div>
+          <div class="q-tags" id="qTags"></div>
+        </div>
+      </div>
+      <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border); font-size:14px; line-height:1.7;" id="qText"></div>
+      <div id="markSolvedWrap" style="display:none; margin-top:14px;">
+        <button class="btn-red" id="markSolvedBtn"><i class="ti ti-check"></i> Позначити вирішеним</button>
+      </div>
+    </div>
+
+    <!-- Відповіді -->
+    <div class="main-header">
+      <span class="main-title">Відповіді (<span id="answersCount">0</span>)</span>
+    </div>
+
+    <div id="answersList" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+    <!-- Форма відповіді -->
+    <div class="ask-box">
+      <div class="ask-box-title">
+        <i class="ti ti-message-2" style="font-size:15px;"></i>
+        Напишіть відповідь
+      </div>
+      <textarea id="answerText" placeholder="Опишіть ваше рішення або пораду..."></textarea>
+      <div class="ask-footer">
+        <button class="btn-red" id="answerSubmit" style="margin-left:auto;">
+          <i class="ti ti-send"></i> Опублікувати відповідь
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Модалка авторизації (та сама, копія з index.html) -->
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="authModalTitle">Увійти в акаунт</h3>
+      <button class="modal-close" id="closeAuthModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Увійти</button>
+        <button class="auth-tab" data-tab="register">Реєстрація</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email адреса" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="button" class="btn-red" id="loginBtn">Увійти</button>
+      </form>
+      <form id="registerForm" style="display: none;">
+        <input type="text" id="registerName" placeholder="Ім'я та Прізвище" required>
+        <input type="email" id="registerEmail" placeholder="Email адреса" required>
+        <input type="password" id="registerPassword" placeholder="Придумайте пароль" required>
+        <button type="button" class="btn-red" id="registerBtn">Зареєструватися</button>
+      </form>
+      <div class="auth-footer">
+        <span id="authHelpText">Немає акаунту?</span>
+        <a href="#" id="switchLink">Зареєструватися</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="question.js"></script>
+</body>
+</html>

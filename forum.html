@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форум — АвтоСпільнота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .main { height: auto; overflow: visible; }
+  .forum-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .forum-cat-btn {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 5px 12px; font-size: 12px; font-family: 'Manrope', sans-serif;
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+  .forum-cat-btn.active, .forum-cat-btn:hover {
+    background: var(--text); color: #fff; border-color: var(--text);
+  }
+  #topicModal .modal-content { max-width: 580px; }
+  #topicModal textarea {
+    min-height: 140px; resize: vertical; padding: 14px 16px; font-size: 15px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); outline: none;
+  }
+  #topicModal textarea:focus { border-color: var(--red); }
+  #topicModal select {
+    padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 15px; background: var(--bg); font-family: 'Manrope', sans-serif; color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">
+    <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
+    АвтоСпільнота
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">Питання</a>
+    <a href="garage.html">Гараж</a>
+    <a href="masters.html">Майстри</a>
+    <a href="forum.html" class="active">Форум</a>
+  </nav>
+  <div class="header-actions">
+    <div class="profile-menu">
+      <button class="btn-ghost" id="authTriggerBtn"><i class="ti ti-user"></i> Увійти</button>
+      <div class="profile-dropdown" id="profileDropdown"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
+  </div>
+</header>
+
+<div class="layout" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 900px; margin: 0 auto; width: 100%;">
+    <div class="main-header">
+      <span class="main-title">Форум</span>
+      <button class="btn-red" id="newTopicBtn"><i class="ti ti-plus"></i> Нова тема</button>
+    </div>
+    <div class="forum-cats" id="forumCats">
+      <button class="forum-cat-btn active" data-category="">Усі</button>
+      <button class="forum-cat-btn" data-category="Техніка">Техніка</button>
+      <button class="forum-cat-btn" data-category="Тюнінг">Тюнінг</button>
+      <button class="forum-cat-btn" data-category="Поїздки">Поїздки</button>
+      <button class="forum-cat-btn" data-category="Досвід і поради">Досвід і поради</button>
+      <button class="forum-cat-btn" data-category="Офтопік">Офтопік</button>
+    </div>
+    <div id="topicsList" style="display:flex; flex-direction:column; gap:14px;"></div>
+  </main>
+</div>
+
+<div class="modal" id="topicModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Нова тема</h3>
+      <button class="modal-close" id="closeTopicModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="topicTitle" placeholder="Назва теми">
+      <select id="topicCategory">
+        <option value="">Оберіть категорію</option>
+        <option value="Техніка">Техніка</option>
+        <option value="Тюнінг">Тюнінг</option>
+        <option value="Поїздки">Поїздки</option>
+        <option value="Досвід і поради">Досвід і поради</option>
+        <option value="Офтопік">Офтопік</option>
+      </select>
+      <textarea id="topicText" placeholder="Текст повідомлення..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-red" id="saveTopicBtn"><i class="ti ti-send"></i> Опублікувати</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="authModalTitle">Увійти в акаунт</h3>
+      <button class="modal-close" id="closeAuthModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Увійти</button>
+        <button class="auth-tab" data-tab="register">Реєстрація</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email адреса" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="button" class="btn-red" id="loginBtn">Увійти</button>
+      </form>
+      <form id="registerForm" style="display: none;">
+        <input type="text" id="registerName" placeholder="Ім'я та Прізвище" required>
+        <input type="email" id="registerEmail" placeholder="Email адреса" required>
+        <input type="password" id="registerPassword" placeholder="Придумайте пароль" required>
+        <button type="button" class="btn-red" id="registerBtn">Зареєструватися</button>
+      </form>
+      <div class="auth-footer">
+        <span id="authHelpText">Немає акаунту?</span>
+        <a href="#" id="switchLink">Зареєструватися</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="forum.js"></script>
+</body>
+</html>
