@@ -9,16 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
-  .main {
-    height: auto;
-    overflow: visible;
-  }
-
-  .car-icon-lg {
-    font-size: 22px !important;
-  }
-
-  .entry-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .entry-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
 
   #entryTags {
     width: 100%;
@@ -31,6 +22,70 @@
     color: var(--text);
     outline: none;
     margin-top: 8px;
+  }
+
+  .back-link { font-size: 13px; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+  .back-link:hover { color: var(--text); }
+
+  /* ── Банер авто ── */
+  .car-hero {
+    position: relative; overflow: hidden; border-radius: 16px; color: #fff;
+    min-height: 240px; display: flex; align-items: flex-end;
+    background: linear-gradient(135deg, hsl(var(--h, 215) 45% 22%), hsl(calc(var(--h, 215) + 40) 55% 42%));
+  }
+  .car-hero-bg { position: absolute; inset: 0; }
+  .car-hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .car-hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.3) 100%); }
+  .car-hero-content { position: relative; padding: 26px 28px; width: 100%; }
+  .car-hero-title { font-family: 'Unbounded', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; margin: 0 0 12px; word-break: break-word; }
+  .car-hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .hero-chip {
+    font-size: 12px; font-weight: 600; padding: 3px 11px; border-radius: 20px;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
+  }
+  .hero-chip.mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; border-radius: 6px; }
+  .car-hero-owner { font-size: 13px; color: rgba(255,255,255,0.85); }
+  .car-hero-owner a { color: #fff; font-weight: 600; text-decoration: none; }
+  .car-hero-owner a:hover { text-decoration: underline; }
+
+  .car-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 4px 12px; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  }
+  .stat-pill b { color: var(--text); font-weight: 700; }
+
+  .entries-list { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Запис бортжурналу ── */
+  .entry-card {
+    display: flex; gap: 12px; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px 16px 10px; min-width: 0;
+  }
+  .entry-votecol { flex-shrink: 0; width: 38px; }
+  .entry-main { flex: 1; min-width: 0; }
+  .entry-card .entry-cover { max-height: 460px; margin-bottom: 12px; }
+  .entry-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .entry-head .type-badge { margin: 0; }
+  .entry-time { font-size: 12px; color: var(--text-hint); }
+  .entry-title { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 0 0 8px; word-break: break-word; }
+  .entry-text { font-size: 14.5px; line-height: 1.7; color: var(--text); white-space: pre-line; word-break: break-word; }
+
+  /* Колонка голосування без рамки — як у гаражі й на форумі */
+  .vote-pill-v { flex-direction: column; gap: 2px; background: none; border: none; padding: 0; border-radius: 0; }
+  .vote-pill-v .vote-btn { width: 32px; height: 28px; font-size: 20px; border-radius: 8px; }
+  .vote-pill-v .vote-score { min-width: 0; padding: 0; font-size: 14px; }
+
+  .entries-empty { text-align: center; padding: 40px 16px; color: var(--text-muted); background: var(--bg-card); border: 1px dashed var(--border-strong); border-radius: 14px; }
+
+  @media (max-width: 700px) {
+    .car-hero { min-height: 200px; }
+    .car-hero-content { padding: 18px; }
+    .car-hero-title { font-size: 20px; }
+    .entry-card { padding: 12px 12px 14px 6px; gap: 8px; }
+    .entry-votecol { width: 34px; }
+    .entry-title { font-size: 16px; }
   }
 </style>
 </head>
@@ -57,31 +112,32 @@
   </div>
 </header>
 
-<div class="layout" style="grid-template-columns: 1fr;">
-  <main class="main" style="max-width: 760px; margin: 0 auto; width: 100%;">
+<div class="layout layout-page" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 900px; margin: 0 auto; width: 100%;">
 
-    <a href="garage.html" style="font-size:13px; color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-bottom:4px;">
+    <a href="garage.html" class="back-link">
       <i class="ti ti-arrow-left"></i> Назад до гаража
     </a>
 
-    <!-- Картка авто -->
-    <div class="q-card" style="cursor:default;">
-      <div class="q-top">
-        <div class="avatar av-blue" id="carAvatar"><i class="ti ti-car car-icon-lg"></i></div>
-        <div class="q-body">
-          <div class="q-title" id="carTitle" style="white-space:normal; font-size:18px;">Завантаження...</div>
-          <div class="q-meta" id="carMeta"></div>
-          <div class="q-tags" id="carTags"></div>
-        </div>
+    <!-- Банер авто -->
+    <section class="car-hero" id="carHero">
+      <div class="car-hero-bg" id="carHeroBg"></div>
+      <div class="car-hero-shade"></div>
+      <div class="car-hero-content">
+        <h1 class="car-hero-title" id="carTitle">Завантаження...</h1>
+        <div class="car-hero-chips" id="carChips"></div>
+        <div class="car-hero-owner" id="carMeta"></div>
       </div>
-    </div>
+    </section>
+
+    <div class="car-stats" id="carStats"></div>
 
     <!-- Записи бортжурналу -->
     <div class="main-header">
       <span class="main-title">Бортжурнал (<span id="entriesCount">0</span>)</span>
     </div>
 
-    <div id="entriesList" style="display:flex; flex-direction:column; gap:10px;"></div>
+    <div id="entriesList" class="entries-list"></div>
 
     <!-- Форма нового запису (тільки для власника) -->
     <div class="ask-box" id="addEntryBox" style="display:none;">
@@ -90,7 +146,18 @@
         Новий запис
       </div>
       <input type="text" id="entryTitle" placeholder="Заголовок (наприклад, Замінив ГРМ)" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-family:'Manrope', sans-serif; background:var(--bg); color:var(--text); outline:none;">
-      <textarea id="entryText" placeholder="Опишіть, що зробили..."></textarea>
+      <select id="entryType" class="form-field">
+  <option value="repair">🔧 Ремонт</option>
+  <option value="tuning">⚡ Тюнінг</option>
+  <option value="project">🚀 Проєкт</option>
+</select>
+<input type="text" id="entryCover" class="form-field" placeholder="Посилання на фото (необов'язково)">
+<label class="file-pick">
+  <i class="ti ti-photo"></i> або завантажити з пристрою
+  <input type="file" id="entryCoverFile" accept="image/*" hidden>
+</label>
+<div id="entryCoverPreview"></div>
+<textarea id="entryText" placeholder="Опишіть, що зробили..."></textarea>
       <input type="text" id="entryTags" placeholder="Теги через кому (наприклад: ремонт, грм)">
       <div class="ask-footer">
         <button class="btn-red" id="entrySubmit" style="margin-left:auto;">

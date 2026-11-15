@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Адмінка — АвтоСпільнота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Стилі адмінки живуть тут, а не в style.css: публічні сторінки про адмінку нічого не знають */
+  .adm-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .adm-title { font-family:'Unbounded', sans-serif; font-size:20px; margin:0; }
+  .adm-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .adm-tab { border:1px solid var(--border); background:var(--bg-card); color:var(--text); border-radius:999px; padding:7px 14px; font:inherit; font-size:13px; cursor:pointer; }
+  .adm-tab.active { background:var(--text); color:#fff; border-color:var(--text); }
+  .adm-card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
+  .adm-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px; }
+  .adm-grid .adm-card { margin-bottom:0; }
+  .adm-num { font-size:26px; font-weight:700; line-height:1.2; }
+  .adm-muted { color:var(--text-muted); }
+  .adm-row { display:flex; justify-content:space-between; padding:4px 0; font-size:14px; }
+  .adm-user { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .adm-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .adm-btn { padding:6px 12px; font-size:13px; }
+  .adm-danger { color:var(--red); border-color:var(--red); }
+  .adm-input, .adm-select { width:100%; max-width:420px; padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:var(--bg-card); color:var(--text); font:inherit; font-size:14px; }
+  .adm-select { width:auto; padding:6px 10px; }
+  @media (max-width:600px) {
+    .adm-user {
+      flex-direction:column; align-items:flex-start; }
+    .adm-actions { width:100%; }
+  }
+  .adm-badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:var(--bg); border:1px solid var(--border); }
+  .adm-badge.owner { background:#fdecec; color:#b3261e; border-color:#f3c4c1; }
+  .adm-badge.moderator { background:#e8f1fd; color:#1a56b0; border-color:#c3d6f3; }
+  .adm-badge.banned { background:#fdecec; color:#b3261e; border-color:#f3c4c1; margin-left:6px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">
+    <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
+    АвтоСпільнота
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">Питання</a>
+    <a href="garage.html">Гараж</a>
+    <a href="masters.html">Майстри</a>
+    <a href="forum.html">Форум</a>
+  </nav>
+  <div class="header-actions">
+    <div class="profile-menu">
+      <button class="btn-ghost" id="authTriggerBtn"><i class="ti ti-user"></i> Увійти</button>
+      <div class="profile-dropdown" id="profileDropdown"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
+      </div>
+</header>
+
+<div class="layout layout-page" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 900px; margin: 0 auto; width: 100%;">
+    <div id="adminRoot"><div class="adm-muted">Завантаження…</div></div>
+  </main>
+</div>
+
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="authModalTitle">Увійти в акаунт</h3>
+      <button class="modal-close" id="closeAuthModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Увійти</button>
+        <button class="auth-tab" data-tab="register">Реєстрація</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email адреса" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="button" class="btn-red" id="loginBtn">Увійти</button>
+      </form>
+      <form id="registerForm" style="display: none;">
+        <input type="text" id="registerName" placeholder="Ім'я та Прізвище" required>
+        <input type="email" id="registerEmail" placeholder="Email адреса" required>
+        <input type="password" id="registerPassword" placeholder="Придумайте пароль" required>
+        <button type="button" class="btn-red" id="registerBtn">Зареєструватися</button>
+      </form>
+      <div class="auth-footer">
+        <span id="authHelpText">Немає акаунту?</span>
+        <a href="#" id="switchLink">Зареєструватися</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

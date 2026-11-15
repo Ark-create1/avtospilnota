@@ -3,31 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мій профіль — АвтоСпільнота</title>
+<title>Профіль користувача — АвтоСпільнота</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* ── Профіль: цій сторінці не потрібна фіксована висота/scroll-колонка з index.html ── */
-  .main {
-    height: auto;
-    overflow: visible;
-  }
+  .main { height: auto; overflow: visible; }
 
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  /* ── Картка профілю ── */
+  .profile-card-master {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
 
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
+  .profile-cover {
+    height: 140px;
+    background: linear-gradient(120deg, var(--red), var(--blue));
+    position: relative;
+  }
+
+  .profile-rank-badge {
+    background: rgba(255,255,255,0.9);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .profile-main-info { padding: 0 24px 20px; }
+
+  .profile-avatar-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: -42px;
+    margin-bottom: 12px;
+  }
+
+  .profile-avatar-large {
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     background: var(--red-light);
     color: var(--red-dark);
@@ -35,50 +59,173 @@
     align-items: center;
     justify-content: center;
     font-family: 'Unbounded', sans-serif;
-    font-weight: 600;
-    font-size: 22px;
+    font-weight: 700;
+    font-size: 28px;
+    border: 4px solid var(--bg-card);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.18);
     flex-shrink: 0;
   }
 
-  .profile-name {
+  .profile-user-title-row { display: flex; flex-direction: column; gap: 4px; }
+
+  .profile-name-large {
     font-family: 'Unbounded', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: 700;
   }
 
-  .profile-stats {
-    display: flex;
-    gap: 18px;
-    font-size: 13px;
-    color: var(--text-muted);
+  /* ── Стрічка статистики ── */
+  .profile-stats-ribbon {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-top: 18px;
   }
 
-  .profile-stats b {
-    color: var(--text);
-    font-family: 'Unbounded', sans-serif;
-    font-weight: 600;
-  }
-
-  .profile-tabs {
-    display: flex;
-    gap: 6px;
-  }
-
-  .profile-empty {
+  .profile-stat-box {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 8px;
     text-align: center;
-    padding: 60px 20px;
-    color: var(--text-hint);
+  }
+
+  .profile-stat-number {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .profile-stat-desc { font-size: 10.5px; color: var(--text-hint); margin-top: 2px; }
+
+  @media (max-width: 720px) {
+    .profile-stats-ribbon { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ── Вкладки ── */
+  .profile-nav-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    margin: 20px 0 16px;
+    padding-bottom: 2px;
+  }
+
+  .profile-tab-btn {
+    background: none;
+    border: none;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: 'Manrope', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .profile-tab-btn:hover { color: var(--text); background: var(--bg); }
+
+  .profile-tab-btn.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+    font-weight: 600;
+  }
+
+  .badge-count {
+    background: var(--border);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .profile-tab-btn.active .badge-count { background: var(--red-light); color: var(--red-dark); }
+
+  /* ── Гараж (грід карток) ── */
+  .car-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  /* ── Сервісна історія ── */
+  .logbook-summary-card {
+    display: flex;
+    gap: 12px;
+  }
+
+  .logbook-metric {
+    flex: 1;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  .profile-empty i {
-    font-size: 36px;
+  .logbook-metric-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ── Налаштування ── */
+  .profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .profile-form-grid { grid-template-columns: 1fr; }
+  }
+
+  #settingsForm label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
     display: block;
-    margin-bottom: 12px;
-    opacity: .5;
+    margin-bottom: 4px;
+  }
+
+  #settingsForm input[type="text"],
+  #settingsForm input[type="tel"],
+  #settingsForm textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  #settingsForm input:focus, #settingsForm textarea:focus { border-color: var(--red); }
+
+  .settings-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
   }
 
   .answer-source {
@@ -93,18 +240,189 @@
     flex-wrap: wrap;
   }
 
-  .answer-source a {
-    color: var(--red);
-    text-decoration: none;
-    font-weight: 500;
+  .answer-source a { color: var(--red); text-decoration: none; font-weight: 500; }
+  .answer-source a:hover { text-decoration: underline; }
+
+  .profile-empty {
+    text-align: center;
+    padding: 44px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
   }
 
-  .answer-source a:hover { text-decoration: underline; }
+  .profile-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 14px;
+  }
+
+  .profile-empty-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .profile-empty-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 340px;
+    margin: 0 auto 18px;
+    line-height: 1.5;
+  }
+
+  .add-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    background: var(--bg-card);
+    color: var(--text-hint);
+    text-decoration: none;
+    font-size: 36px;
+    transition: all 0.15s;
+  }
+
+  .add-tile:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-light);
+  }
+
+  /* ── Картка авто в гаражі профілю ── */
+  .pcar-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+
+  .pcar-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .pcar-banner {
+    height: 116px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-strong);
+    font-size: 40px;
+  }
+
+  .pcar-body { padding: 14px 16px; }
+
+  .pcar-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+
+  .pcar-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+
+  .pcar-spec-lbl { font-size: 10px; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.04em; }
+  .pcar-spec-val { font-size: 12.5px; font-weight: 600; color: var(--text); }
+
+  .pcar-foot {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── Запис бортжурналу / тема форуму ── */
+  .plog-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .plog-item:hover {
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  }
+
+  .plog-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .plog-car {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--blue-light);
+    color: var(--blue);
+    padding: 2px 9px;
+    border-radius: 20px;
+  }
+
+  .plog-date { font-size: 11.5px; color: var(--text-hint); }
+
+  .plog-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .plog-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-top: 6px;
+  }
+
+  .plog-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+
+  .ptopic-stats {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-hint);
+  }
 </style>
 </head>
 <body>
 
-<!-- HEADER (той самий, що на інших сторінках) -->
+<!-- HEADER -->
 <header class="header">
   <a href="index.html" class="logo">
     <span class="logo-icon"><i class="ti ti-steering-wheel" style="color:#fff; font-size:17px;"></i></span>
@@ -122,22 +440,171 @@
       <div class="profile-dropdown" id="profileDropdown"></div>
     </div>
     <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
-   </div>
+  </div>
 </header>
 
-<div class="layout" style="grid-template-columns: 1fr;">
-  <main class="main" style="max-width: 760px; margin: 0 auto; width: 100%; display:flex; flex-direction:column; gap:16px;">
+<div class="layout layout-page" style="grid-template-columns: 1fr;">
+  <main class="main" style="max-width: 1000px; margin: 0 auto; width: 100%; padding: 20px 20px 40px;">
 
-    <a href="index.html" style="font-size:13px; color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-bottom:4px;">
-      <i class="ti ti-arrow-left"></i> Назад до питань
-    </a>
+    <!-- Не залогінений і немає чийогось профілю для перегляду -->
+    <div id="unauthProfileBlock" style="display:none; text-align:center; padding:60px 20px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border);">
+      <i class="ti ti-user-circle" style="font-size:48px; color:var(--text-hint); margin-bottom:12px;"></i>
+      <h2 style="font-family:'Unbounded',sans-serif; font-size:20px; margin-bottom:8px;">Особистий кабінет автомобіліста</h2>
+      <p style="color:var(--text-muted); font-size:14px; max-width:440px; margin:0 auto 20px;">Увійдіть у свій акаунт, щоб вести бортжурнал авто, переглядати свої питання та спілкуватися на форумі.</p>
+      <button class="btn-red" id="unauthLoginBtn"><i class="ti ti-user"></i> Увійти / Реєстрація</button>
+    </div>
 
-    <div id="profileContent"></div>
+    <div id="authProfileBlock" style="display:none;">
+
+      <div class="profile-card-master">
+        <div class="profile-cover">
+          <div style="position:absolute; bottom:12px; right:16px;" id="profileBadgeWrap"></div>
+        </div>
+
+        <div class="profile-main-info">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-large" id="profileAvatarLarge">??</div>
+            <div style="display:flex; gap:8px; align-items:center;" id="profileOwnerActions"></div>
+          </div>
+
+          <div class="profile-user-title-row">
+            <div class="profile-name-large" id="profileName">Завантаження...</div>
+            <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted); flex-wrap:wrap;" id="profileMetaRow"></div>
+            <div style="font-size:13.5px; color:var(--text); line-height:1.5; margin-top:4px;" id="profileBio"></div>
+          </div>
+
+          <div class="profile-stats-ribbon">
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatCars">0</div>
+              <div class="profile-stat-desc">Авто в гаражі</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatEntries">0</div>
+              <div class="profile-stat-desc">Записів робіт</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatQuestions">0</div>
+              <div class="profile-stat-desc">Питань</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatAnswers">0</div>
+              <div class="profile-stat-desc">Відповідей</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatTopics">0</div>
+              <div class="profile-stat-desc">Тем на форумі</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-number" id="pStatReputation">0</div>
+              <div class="profile-stat-desc">Репутація</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-nav-tabs" id="profileTabs">
+        <button class="profile-tab-btn active" data-tab="garage">
+          <i class="ti ti-car"></i> Гараж <span class="badge-count" id="tabCountCars">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="service">
+          <i class="ti ti-tool"></i> Сервісна історія <span class="badge-count" id="tabCountEntries">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="questions">
+          <i class="ti ti-help-circle"></i> Питання <span class="badge-count" id="tabCountQuestions">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="answers">
+          <i class="ti ti-message-circle"></i> Відповіді <span class="badge-count" id="tabCountAnswers">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="topics">
+          <i class="ti ti-messages"></i> Теми форуму <span class="badge-count" id="tabCountTopics">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="settings" id="settingsTabBtn" style="display:none;">
+          <i class="ti ti-settings"></i> Налаштування
+        </button>
+      </div>
+
+      <div id="tabContentArea">
+        <div class="tab-pane" id="tabPaneGarage">
+          <div id="profileCarsGrid" class="car-card-grid"></div>
+        </div>
+
+        <div class="tab-pane" id="tabPaneService" style="display:none;">
+          <div class="logbook-summary-card" style="margin-bottom:14px;">
+            <div class="logbook-metric">
+              <div class="logbook-metric-icon"><i class="ti ti-cash"></i></div>
+              <div>
+                <div style="font-family:'Unbounded',sans-serif; font-size:16px; font-weight:700;" id="userSumSpend">0 ₴</div>
+                <div style="font-size:11px; color:var(--text-hint);">Загальні витрати (ще не відстежується)</div>
+              </div>
+            </div>
+            <div class="logbook-metric">
+              <div class="logbook-metric-icon"><i class="ti ti-checkup-list"></i></div>
+              <div>
+                <div style="font-family:'Unbounded',sans-serif; font-size:16px; font-weight:700;" id="userSumEntries">0 робіт</div>
+                <div style="font-size:11px; color:var(--text-hint);">Всього записів у бортжурналах</div>
+              </div>
+            </div>
+          </div>
+          <div id="userServiceLogList" style="display:flex; flex-direction:column; gap:12px;"></div>
+        </div>
+
+        <div class="tab-pane" id="tabPaneQuestions" style="display:none;">
+          <div id="profileQuestionsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="tab-pane" id="tabPaneAnswers" style="display:none;">
+          <div id="profileAnswersList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="tab-pane" id="tabPaneTopics" style="display:none;">
+          <div id="profileTopicsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="tab-pane" id="tabPaneSettings" style="display:none;">
+          <div id="settingsForm" style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 24px;">
+            <h3 style="font-family:'Unbounded',sans-serif; font-size:16px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+              <i class="ti ti-user-cog" style="color:var(--red);"></i> Налаштування профілю
+            </h3>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div class="profile-form-grid">
+                <div>
+                  <label>Місто проживання</label>
+                  <input type="text" id="editCity" placeholder="Наприклад: Вінниця">
+                </div>
+                <div>
+                  <label>Стаж водіння</label>
+                  <input type="text" id="editExp" placeholder="Наприклад: 12 років за кермом">
+                </div>
+              </div>
+
+              <div>
+                <label>Телефон</label>
+                <input type="tel" id="editPhone" placeholder="+380 50 123 45 67">
+                <div class="settings-checkbox-row">
+                  <input type="checkbox" id="editShowPhone">
+                  <label for="editShowPhone" style="margin:0; font-weight:400; cursor:pointer;">Показувати телефон у профілі (видно всім відвідувачам)</label>
+                </div>
+              </div>
+
+              <div>
+                <label>Про себе</label>
+                <textarea id="editBio" rows="4" placeholder="Розкажіть трохи про свій досвід, які марки авто подобаються, чим можете допомогти іншим..."></textarea>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                <button class="btn-red" id="saveProfileSettingsBtn"><i class="ti ti-check"></i> Зберегти зміни</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
   </main>
 </div>
 
-<!-- Модалка авторизації (та сама, копія з index.html) -->
+<!-- Модалка авторизації -->
 <div class="modal" id="authModal">
   <div class="modal-content">
     <div class="modal-header">

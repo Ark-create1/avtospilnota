@@ -515,6 +515,7 @@ body {
 
 .chat-input-area input {
   flex: 1;
+  min-width: 0;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -953,9 +954,6 @@ body {
 }
 
 @media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 200px minmax(0, 1fr) 180px;
-  }
   .header-search {
     display: none;
   }
@@ -972,7 +970,44 @@ body {
   }
 }
 
-@media (max-width: 768px) {
+/* Нижня навігація для телефонів (розмітку додає main.js, на ПК прихована) */
+.mobile-nav { display: none; }
+
+/* Єдина межа «мобільного» режиму — 900px (планшети в портреті теж тут): одна колонка, сайдбар за гамбургером,
+   нижня навігація, чат кнопкою. Така сама межа в chat.js і main.js (MOBILE_MAX). */
+@media (max-width: 900px) {
+
+  /* Одна колонка. Сайдбар тут fixed (поза потоком), тож без цього .main потрапляв у вузьку першу колонку сітки */
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 450;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .mobile-nav-item i { font-size: 22px; }
+  .mobile-nav-item.active { color: var(--red); }
+  body { padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px)); }
 
   .sidebar {
     position: fixed;
@@ -1116,3 +1151,79 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
+
+/* ====== Гараж: типи записів, обкладинки, завантаження фото ====== */
+.form-field { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-family:'Manrope',sans-serif; background:var(--bg); color:var(--text); outline:none; }
+.form-field:focus { border-color: var(--red); }
+.entry-cover { display:block; width:100%; max-height:320px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
+.type-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; margin-right:6px; vertical-align:middle; }
+.type-repair { background:var(--blue-light); color:var(--blue); }
+.type-tuning { background:var(--red-light); color:var(--red-dark); }
+.type-project { background:var(--amber-light); color:var(--amber); }
+.file-pick { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text-muted); cursor:pointer; padding:6px 0; }
+.file-pick:hover { color:var(--red); }
+.cover-preview { position:relative; display:inline-block; margin:4px 0 8px; }
+.cover-preview img { display:block; max-width:100%; max-height:160px; border-radius:10px; }
+.cover-preview-clear { position:absolute; top:6px; right:6px; width:24px; height:24px; border:none; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; font-size:16px; line-height:1; cursor:pointer; }
+
+/* ====== Голосування ▲ рахунок ▼ (гараж, форум) ====== */
+.vote-pill {
+  display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 2px;
+}
+.vote-btn {
+  width: 30px; height: 28px; display: flex; align-items: center; justify-content: center;
+  background: none; border: none; border-radius: 50%; color: var(--text-hint); font-size: 17px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.vote-btn:hover { background: var(--bg-card); color: var(--text); }
+.vote-btn.active-up { color: var(--red); background: var(--red-light); }
+.vote-btn.active-down { color: var(--blue); background: var(--blue-light); }
+.vote-score { min-width: 24px; text-align: center; font-size: 13px; font-weight: 700; color: var(--text-muted); font-family: 'Unbounded', sans-serif; }
+.vote-score.pos { color: var(--red); }
+.vote-score.neg { color: var(--blue); }
+
+/* ====== Сторінки з прокруткою (форум, тема): без фіксованої висоти .layout ====== */
+.layout-page { height: auto; overflow: visible; }
+.layout-page .main { height: auto; overflow: visible; min-height: 0; }
+.layout-page .main > * { flex-shrink: 0; }
+
+/* ── Зручні для пальця розміри на планшетах і телефонах ── */
+@media (max-width: 900px) {
+  .btn-red, .btn-ghost,
+  .filter-btn, .forum-cat-btn, .spec-chip, .auth-tab { min-height: 38px; }
+  .forum-subcat-btn { min-height: 32px; }
+  .header .btn-red, .header .btn-ghost { min-height: 36px; }
+  .vote-btn { min-width: 36px; min-height: 36px; }
+  .back-link, .main > a:first-child { min-height: 36px; display: inline-flex; align-items: center; }
+}
+
+/* ── Вузька шапка: кнопки лише з іконками, щоб усе вміщалось у 320–600px ── */
+@media (max-width: 600px) {
+  .header { gap: 6px; padding: 0 10px; }
+  .header-actions { gap: 6px; }
+  .header-name, .btn-label { display: none; }
+  #logoutBtn { font-size: 0; gap: 0; }
+  #logoutBtn i { font-size: 18px; }
+  #logoutBtn, .header-actions > .btn-red { min-width: 36px; justify-content: center; }
+}
+@media (max-width: 400px) {
+  .logo { font-size: 15px; gap: 6px; }
+}
+
+/* ── Футер (підвал сайту), розмітку додає main.js ── */
+.site-footer { background: #1a1a1a; color: #cfcfcf; margin-top: 32px; padding: 28px 20px 18px; font-size: 13px; }
+.site-footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 24px; }
+.sf-brand b { display: block; color: #fff; font-family: 'Unbounded', sans-serif; font-size: 15px; margin-bottom: 8px; }
+.sf-brand span { display: block; color: #9a9a9a; line-height: 1.5; max-width: 280px; }
+.site-footer h4 { margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #fff; }
+.site-footer a { display: block; padding: 4px 0; color: #cfcfcf; text-decoration: none; }
+.site-footer a:hover { color: #fff; text-decoration: underline; }
+.sf-bottom { max-width: 1200px; margin: 20px auto 0; padding-top: 14px; border-top: 1px solid #333; color: #8a8a8a; font-size: 12px; }
+@media (max-width: 900px) {
+  .site-footer-inner { grid-template-columns: 1fr 1fr; }
+  .sf-brand { grid-column: 1 / -1; }
+  /* body тут має висоту 100%, тож його padding-bottom не додається після вмісту: відступ під нижню навігацію ставимо на футері */
+  .site-footer { padding-bottom: calc(18px + 58px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 480px) { .site-footer-inner { grid-template-columns: 1fr; } }

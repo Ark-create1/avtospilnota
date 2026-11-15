@@ -10,7 +10,20 @@
 <link rel="stylesheet" href="style.css">
 <style>
   .main { height: auto; overflow: visible; }
-  .forum-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+
+  .forum-sort { margin-bottom: 14px; flex-wrap: wrap; }
+  #topicsList .q-footer { flex-wrap: wrap; row-gap: 8px; }
+  /* Збоку: вертикальна колонка голосування */
+  .topic-card { display: flex; gap: 12px; align-items: flex-start; }
+  .topic-votecol { flex-shrink: 0; }
+  .topic-main { flex: 1; min-width: 0; }
+  /* Як у колонці голосування гаража: стрілки й рахунок без рамки */
+  .topic-votecol { width: 38px; }
+  .vote-pill-v { flex-direction: column; gap: 2px; background: none; border: none; padding: 0; border-radius: 0; }
+  .vote-pill-v .vote-btn { width: 32px; height: 28px; font-size: 20px; border-radius: 8px; }
+  .vote-pill-v .vote-score { min-width: 0; padding: 0; font-size: 14px; }
+
+  .forum-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .forum-cat-btn {
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
     padding: 5px 12px; font-size: 12px; font-family: 'Manrope', sans-serif;
@@ -19,9 +32,47 @@
   .forum-cat-btn.active, .forum-cat-btn:hover {
     background: var(--text); color: #fff; border-color: var(--text);
   }
+
+  .forum-subcats {
+    display: none;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border-radius: 10px;
+  }
+  .forum-subcats.show { display: flex; }
+  .forum-subcat-btn {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 3px 10px; font-size: 11px; font-family: 'Manrope', sans-serif;
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+  .forum-subcat-btn.active, .forum-subcat-btn:hover {
+    background: var(--red); color: #fff; border-color: var(--red);
+  }
+
+  /* ── Картка теми: аватар-стек + прев'ю останньої відповіді ── */
+  .avatar-stack { display: flex; align-items: center; }
+  .avatar-stack .avatar {
+    width: 22px; height: 22px; font-size: 9px;
+    border: 2px solid var(--bg-card);
+    margin-left: -8px;
+  }
+  .avatar-stack .avatar:first-child { margin-left: 0; }
+
+  .last-reply-preview {
+    font-size: 12px;
+    color: var(--text-hint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+
   #topicModal .modal-content { max-width: 580px; }
   #topicModal textarea {
-    min-height: 140px; resize: vertical; padding: 14px 16px; font-size: 15px;
+    min-height: 120px; resize: vertical; padding: 14px 16px; font-size: 15px;
     border: 1.5px solid var(--border); border-radius: 10px;
     font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); outline: none;
   }
@@ -30,6 +81,51 @@
     padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
     font-size: 15px; background: var(--bg); font-family: 'Manrope', sans-serif; color: var(--text);
   }
+  #topicSubcategory { display: none; }
+
+  .media-field-label {
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px; margin-bottom: -6px;
+  }
+
+  .media-row { display: flex; gap: 8px; align-items: center; }
+  .media-row input[type="text"] { flex: 1; }
+
+  .file-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; color: var(--text-muted);
+    cursor: pointer; white-space: nowrap; font-family: 'Manrope', sans-serif;
+  }
+  .file-btn:hover { border-color: var(--red); color: var(--red); }
+  .file-btn input[type="file"] { display: none; }
+
+  .media-preview { margin-top: 4px; }
+  .media-preview img { max-width: 100%; max-height: 160px; border-radius: 10px; display: block; }
+  .media-preview .yt-embed { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; }
+  .media-preview .yt-embed iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
+  .media-preview .remove-media { font-size: 11px; color: var(--text-hint); cursor: pointer; margin-top: 4px; display: inline-block; }
+  .media-preview .remove-media:hover { color: var(--red); }
+
+  /* ── Завантаження, помилка, «Показати ще» ── */
+  .forum-skeleton {
+    height: 130px; border-radius: 14px; border: 1px solid var(--border);
+    background: linear-gradient(90deg, var(--bg-card) 25%, #eceae4 50%, var(--bg-card) 75%);
+    background-size: 200% 100%; animation: forumShimmer 1.3s infinite linear;
+  }
+  @keyframes forumShimmer { to { background-position: -200% 0; } }
+  .forum-error {
+    text-align: center; padding: 36px 16px; color: var(--text-muted);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .forum-more { display: flex; justify-content: center; padding: 6px 0 14px; }
+  .btn-more {
+    background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 20px;
+    padding: 10px 26px; font-size: 13.5px; font-weight: 600; font-family: 'Manrope', sans-serif;
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+  }
+  .btn-more:hover:not(:disabled) { background: var(--text); color: #fff; border-color: var(--text); }
+  .btn-more:disabled { opacity: 0.6; cursor: default; }
 </style>
 </head>
 <body>
@@ -54,12 +150,13 @@
   </div>
 </header>
 
-<div class="layout" style="grid-template-columns: 1fr;">
+<div class="layout layout-page" style="grid-template-columns: 1fr;">
   <main class="main" style="max-width: 900px; margin: 0 auto; width: 100%;">
     <div class="main-header">
       <span class="main-title">Форум</span>
       <button class="btn-red" id="newTopicBtn"><i class="ti ti-plus"></i> Нова тема</button>
     </div>
+
     <div class="forum-cats" id="forumCats">
       <button class="forum-cat-btn active" data-category="">Усі</button>
       <button class="forum-cat-btn" data-category="Техніка">Техніка</button>
@@ -68,6 +165,16 @@
       <button class="forum-cat-btn" data-category="Досвід і поради">Досвід і поради</button>
       <button class="forum-cat-btn" data-category="Офтопік">Офтопік</button>
     </div>
+
+    <div class="forum-subcats" id="forumSubcats"></div>
+
+    <div class="filters forum-sort" id="forumSort">
+      <button class="filter-btn active" data-sort="new"><i class="ti ti-clock"></i> Нові</button>
+      <button class="filter-btn" data-sort="week"><i class="ti ti-flame"></i> Топ тижня</button>
+      <button class="filter-btn" data-sort="month"><i class="ti ti-calendar"></i> Топ місяця</button>
+      <button class="filter-btn" data-sort="all"><i class="ti ti-trophy"></i> За весь час</button>
+    </div>
+
     <div id="topicsList" style="display:flex; flex-direction:column; gap:14px;"></div>
   </main>
 </div>
@@ -80,6 +187,7 @@
     </div>
     <div class="modal-body">
       <input type="text" id="topicTitle" placeholder="Назва теми">
+
       <select id="topicCategory">
         <option value="">Оберіть категорію</option>
         <option value="Техніка">Техніка</option>
@@ -88,7 +196,24 @@
         <option value="Досвід і поради">Досвід і поради</option>
         <option value="Офтопік">Офтопік</option>
       </select>
+
+      <select id="topicSubcategory"></select>
+
       <textarea id="topicText" placeholder="Текст повідомлення..."></textarea>
+
+      <div class="media-field-label"><i class="ti ti-photo"></i> Фото (опційно)</div>
+      <div class="media-row">
+        <input type="text" id="topicPhotoUrl" placeholder="Посилання на фото (URL)...">
+        <label class="file-btn">
+          <i class="ti ti-upload"></i> Файл
+          <input type="file" id="topicPhotoFile" accept="image/*">
+        </label>
+      </div>
+      <div class="media-preview" id="topicPhotoPreview"></div>
+
+      <div class="media-field-label"><i class="ti ti-brand-youtube"></i> YouTube-відео (опційно)</div>
+      <input type="text" id="topicYoutubeUrl" placeholder="Посилання на YouTube-відео...">
+      <div class="media-preview" id="topicYoutubePreview"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-red" id="saveTopicBtn"><i class="ti ti-send"></i> Опублікувати</button>

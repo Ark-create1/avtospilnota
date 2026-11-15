@@ -44,7 +44,7 @@
       <div class="profile-dropdown" id="profileDropdown"></div>
     </div>
     <button class="btn-ghost" id="logoutBtn" style="display:none;"><i class="ti ti-logout"></i> Вийти</button>
-        <button class="btn-red"><i class="ti ti-plus"></i> Задати питання</button>
+        <button class="btn-red" aria-label="Задати питання"><i class="ti ti-plus"></i> <span class="btn-label">Задати питання</span></button>
   </div>
 </header>
 
@@ -212,55 +212,8 @@
 
   </main>
 
-  <!-- CHAT PANEL -->
-  <aside class="chat-panel">
-    <div class="chat-head">
-      <i class="ti ti-messages" style="font-size:17px; color:var(--red);"></i>
-      Онлайн-чат
-      <div class="online-count">
-        <div class="online-dot"></div>
-        12 онлайн
-      </div>
-      <button class="chat-sheet-close" id="chatSheetClose"><i class="ti ti-x"></i></button>
-    </div>
-
-    <div class="chat-msgs" id="chatMsgs">
-      <div class="msg-wrap">
-        <div class="msg-author">Сергій В.</div>
-        <div class="msg-bubble">Хлопці, хто знає де у Вінниці нормально роблять АКПП?</div>
-      </div>
-      <div class="msg-wrap">
-        <div class="msg-author">Андрій М.</div>
-        <div class="msg-bubble">Спробуй на вул. Пирогова, там Василь майстер — золоті руки 👍</div>
-      </div>
-      <div class="msg-wrap">
-        <div class="msg-author">Ігор Д.</div>
-        <div class="msg-bubble">+1 до Василя, сам у нього робив минулого року</div>
-      </div>
-      <div class="msg-wrap me">
-        <div class="msg-author" style="text-align:right;">Ви</div>
-        <div class="msg-bubble">Дякую, запишусь!</div>
-      </div>
-      <div class="msg-wrap">
-        <div class="msg-author">Олена Г.</div>
-        <div class="msg-bubble">А хто знає норму тиску в шинах для Skoda Octavia A7?</div>
-      </div>
-      <div class="msg-wrap">
-        <div class="msg-author">Роман К.</div>
-        <div class="msg-bubble">Спереду 2.2 бар, ззаду 2.0 для літніх. Зимою +0.2</div>
-      </div>
-    </div>
-    <div class="chat-input-area">
-      <input 
-      type="text"
-      id="chatInput"
-      placeholder="Написати повідомлення..." 
-      onkeydown="if(event.key === 'Enter') sendMessage()">
-      <button class="chat-send" onclick="sendMessage()">
-        <i class="ti ti-send"></i>
-      </button>
-    </div>
-  </aside>
+  <!-- CHAT PANEL (наповнюється з chat.js) -->
+  <aside class="chat-panel" id="chatDock"></aside>
 
 </div>
 

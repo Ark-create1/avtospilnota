@@ -1,4 +1,5 @@
-// masters.js — суто логіка сторінки Майстрів (карта + фільтри + додавання СТО)
+// masters.js — сторінка Майстрів (карта + фільтри + додавання СТО).
+// Дані з бекенду: GET /masters, POST /masters, DELETE /masters/{id}
 
 let mastersMap = null;
 let mastersMarkersLayer = null;
@@ -6,13 +7,35 @@ let mastersMarkersById = {};
 let placingMode = false;
 let pendingCoords = null;
 let activeSpecFilters = [];
+let mastersData = [];          // усі СТО з сервера (фільтруємо на клієнті — карта реагує миттєво)
+let mastersLoaded = false;
+let mastersError = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     initMastersMap();
     renderSpecFilters();
     renderSpecPicker();
-    renderMastersList();
-    renderMastersOnMap();
+    initRail();
+    initLocate();
+    loadMasters();
+
+    // Повторна спроба після помилки завантаження
+    const listEl = document.getElementById('mastersList');
+    if (listEl) {
+        listEl.addEventListener('click', (e) => {
+            if (e.target.closest('[data-action="retry"]')) loadMasters();
+        });
+    }
+
+    // Після входу чи виходу змінюється, кому показувати кнопку «Видалити» у спливаючому вікні
+    document.addEventListener('autospilnota:auth', () => renderMastersOnMap());
+
+    // Кнопка «Видалити» у спливаючому вікні. Слухач на document у фазі перехоплення: Leaflet зупиняє
+    // спливання кліків усередині вікна й перемальовує його вміст, тому прив'язка до самої кнопки ненадійна.
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest && e.target.closest('.mp-delete');
+        if (btn) deleteMaster(parseInt(btn.dataset.id, 10));
+    }, true);
 
     const searchInput = document.getElementById('masterSearchInput');
     if (searchInput) {
@@ -26,10 +49,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addMasterBtn) {
         addMasterBtn.addEventListener('click', () => {
             if (!appState.isLoggedIn) {
-                alert("Щоб додати СТО, потрібно увійти");
+                showToast('Щоб додати СТО, потрібно увійти', 'error');
                 openAuthModal();
                 return;
             }
+            startPlacingMode();
+        });
+    }
+
+    const addMasterManualBtn = document.getElementById('addMasterManualBtn');
+    if (addMasterManualBtn) {
+        addMasterManualBtn.addEventListener('click', () => {
+            if (!appState.isLoggedIn) {
+                showToast('Щоб додати СТО, потрібно увійти', 'error');
+                openAuthModal();
+                return;
+            }
+            pendingCoords = null;
+            openMasterModal();
+        });
+    }
+
+    const pickOnMapBtn = document.getElementById('pickOnMapBtn');
+    if (pickOnMapBtn) {
+        pickOnMapBtn.addEventListener('click', () => {
+            closeMasterModal();
             startPlacingMode();
         });
     }
@@ -51,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initMastersMap() {
-    mastersMap = L.map('mastersMap').setView([49.2331, 28.4682], 12); // Вінниця за замовчуванням
+    mastersMap = L.map('mastersMap', { zoomControl: false }).setView([48.6, 31.2], 6); // вся Україна, поки позиція невідома
+    L.control.zoom({ position: 'topright' }).addTo(mastersMap);
 
     L.maplibreGL({
         style: 'https://tiles.openfreemap.org/styles/liberty'
@@ -68,15 +113,54 @@ function initMastersMap() {
     });
 }
 
+let myLocationMarker = null;
+
+// silent=true: автоматичний виклик (без повідомлень про помилки). Координати нікуди не надсилаються.
+function locateMe(silent) {
+    if (!navigator.geolocation) {
+        if (!silent) showToast('Цей браузер не підтримує геолокацію', 'error');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(pos => {
+        const ll = [pos.coords.latitude, pos.coords.longitude];
+        mastersMap.setView(ll, 13);
+        if (myLocationMarker) {
+            myLocationMarker.setLatLng(ll);
+        } else {
+            myLocationMarker = L.circleMarker(ll, {
+                radius: 8, color: '#ffffff', weight: 3, fillColor: '#1a73e8', fillOpacity: 1
+            }).addTo(mastersMap);
+        }
+    }, err => {
+        if (silent) return;
+        showToast(err.code === 1
+            ? 'Доступ до геолокації заборонено. Дозвольте його в налаштуваннях браузера'
+            : 'Не вдалося визначити позицію', 'error');
+    }, { timeout: 10000, maximumAge: 300000 });
+}
+
+function initLocate() {
+    const btn = document.getElementById('locateBtn');
+    if (btn) btn.addEventListener('click', () => locateMe(false));
+    // Якщо дозвіл уже надано раніше — центруємо карту автоматично, інакше чекаємо кнопку.
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' })
+            .then(r => { if (r.state === 'granted') locateMe(true); })
+            .catch(() => {});
+    }
+}
+
 function startPlacingMode() {
     placingMode = true;
     document.getElementById('mastersMap').style.cursor = 'crosshair';
-    alert("Клікніть на карті в тому місці, де знаходиться СТО");
+    showToast('Клікніть на карті в тому місці, де знаходиться СТО');
 }
 
 function openMasterModal() {
     const modal = document.getElementById('masterModal');
     if (modal) modal.classList.add('show');
+    document.getElementById('masterLat').value = pendingCoords ? pendingCoords.lat.toFixed(6) : '';
+    document.getElementById('masterLng').value = pendingCoords ? pendingCoords.lng.toFixed(6) : '';
 }
 
 function closeMasterModal() {
@@ -85,7 +169,7 @@ function closeMasterModal() {
     placingMode = false;
     pendingCoords = null;
     document.getElementById('mastersMap').style.cursor = '';
-    ['masterName', 'masterAddress', 'masterPhone', 'masterDescription'].forEach(id => {
+    ['masterName', 'masterAddress', 'masterPhone', 'masterDescription', 'masterLat', 'masterLng'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
@@ -130,7 +214,7 @@ function renderSpecPicker() {
 
 function getFilteredMasters() {
     const query = (document.getElementById('masterSearchInput')?.value || '').trim().toLowerCase();
-    let masters = getMasters();
+    let masters = mastersData.slice();
 
     if (query) {
         masters = masters.filter(m =>
@@ -152,11 +236,20 @@ function renderMastersList() {
     const countEl = document.getElementById('mastersCount');
     if (!list || !countEl) return;
 
+    if (!mastersLoaded) {
+        countEl.textContent = '0';
+        list.innerHTML = mastersError
+            ? `<div style="color:var(--text-muted); font-size:12px; padding:10px 0;">${escapeHtml(mastersError)}
+                <div style="margin-top:8px;"><button class="btn-red" data-action="retry" style="padding:6px 12px; font-size:12px;"><i class="ti ti-refresh"></i> Спробувати ще</button></div></div>`
+            : `<div style="color:var(--text-hint); font-size:12px; padding:10px 0;">Завантаження...</div>`;
+        return;
+    }
+
     const masters = getFilteredMasters();
     countEl.textContent = masters.length;
 
     if (masters.length === 0) {
-        list.innerHTML = `<div style="color:var(--text-hint); font-size:12px; padding:10px 0;">Нічого не знайдено</div>`;
+        list.innerHTML = `<div style="color:var(--text-hint); font-size:12px; padding:10px 0;">${mastersData.length ? 'Нічого не знайдено' : 'СТО поки немає. Додайте перше!'}</div>`;
         return;
     }
 
@@ -175,7 +268,7 @@ function renderMastersList() {
             list.querySelectorAll('.master-item').forEach(el => el.classList.remove('selected'));
             item.classList.add('selected');
 
-            const master = getMasters().find(m => m.id === item.dataset.id);
+            const master = mastersData.find(m => String(m.id) === item.dataset.id);
             if (!master) return;
             mastersMap.setView([master.lat, master.lng], 15);
 
@@ -201,6 +294,8 @@ function renderMastersOnMap() {
                 <div class="mp-tags">
                     ${(m.specialization || []).map(s => `<span class="mp-tag">${escapeHtml(s)}</span>`).join('')}
                 </div>
+                ${m.added_by ? `<div class="mp-added-by">Додав: ${escapeHtml(m.added_by)}</div>` : ''}
+                ${canDelete(m) ? `<button type="button" class="mp-delete" data-id="${m.id}" style="margin-top:8px; background:none; border:none; color:#A32D2D; font-size:12px; cursor:pointer; padding:0; text-decoration:underline;">Видалити</button>` : ''}
             </div>
         `;
         const marker = L.marker([m.lat, m.lng]).bindPopup(popupHtml).addTo(mastersMarkersLayer);
@@ -208,10 +303,12 @@ function renderMastersOnMap() {
     });
 }
 
-function saveNewMaster() {
-    if (!pendingCoords) {
-        alert("Спочатку клікніть на карті, щоб вказати місце СТО");
-        return;
+async function saveNewMaster() {
+    const lat = parseFloat(document.getElementById('masterLat').value);
+    const lng = parseFloat(document.getElementById('masterLng').value);
+
+    if (isNaN(lat) || isNaN(lng)) {
+        return showToast('Вкажіть координати: клікніть на карті або введіть вручну', 'error');
     }
 
     const name = document.getElementById('masterName').value.trim();
@@ -221,19 +318,79 @@ function saveNewMaster() {
     const specialization = Array.from(document.querySelectorAll('#masterSpecPicker .spec-chip.active'))
         .map(c => c.dataset.spec);
 
-    if (!name || !address) return alert("Вкажіть хоча б назву і адресу");
+    if (!name || !address) return showToast('Вкажіть хоча б назву і адресу', 'error');
 
-    addMaster({
-        name,
-        address,
-        phone,
-        description,
-        specialization,
-        lat: pendingCoords.lat,
-        lng: pendingCoords.lng
-    });
+    const btn = document.getElementById('saveMasterBtn');
+    btn.disabled = true;
+    try {
+        const created = await api('POST', '/masters', { name, address, phone, description, specialization, lat, lng });
+        closeMasterModal();
+        mastersData.unshift(created);
+        mastersLoaded = true;
+        renderMastersList();
+        renderMastersOnMap();
+        mastersMap.setView([created.lat, created.lng], 15);
+        const marker = mastersMarkersById[created.id];
+        if (marker) marker.openPopup();
+        showToast('СТО додано на карту');
+    } catch (e) {
+        showToast(e.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
 
-    closeMasterModal();
+// Видаляти може той, хто додав (адмін — через API)
+function canDelete(m) {
+    return appState.isLoggedIn && m.added_by && appState.currentUser === m.added_by;
+}
+
+async function deleteMaster(id) {
+    if (!confirm('Видалити це СТО з карти?')) return;
+    try {
+        await api('DELETE', `/masters/${id}`);
+        mastersData = mastersData.filter(m => m.id !== id);
+        mastersMap.closePopup();
+        renderMastersList();
+        renderMastersOnMap();
+        showToast('СТО видалено');
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+}
+
+async function loadMasters() {
+    mastersError = '';
+    renderMastersList();
+    try {
+        mastersData = await api('GET', '/masters?limit=500');
+        mastersLoaded = true;
+    } catch (e) {
+        mastersError = e.message;
+        mastersLoaded = false;
+    }
     renderMastersList();
     renderMastersOnMap();
+}
+
+function initRail() {
+    document.querySelectorAll('.rail-btn[data-panel]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const panel = btn.dataset.panel;
+            const flyoutBody = document.getElementById('flyoutBody');
+
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                flyoutBody.classList.remove('show');
+                return;
+            }
+
+            document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.flyout-panel').forEach(p => p.style.display = 'none');
+
+            btn.classList.add('active');
+            document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).style.display = 'block';
+            flyoutBody.classList.add('show');
+        });
+    });
 }
