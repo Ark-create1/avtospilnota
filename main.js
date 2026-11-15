@@ -10,7 +10,7 @@ const appState = {
 // ====================== API: зв'язок із бекендом ======================
 // Адреса бекенду. Змініть тут (наприклад, на https://api.ваш-домен.com) або задайте
 // window.AUTOSPILNOTA_API / localStorage 'autospilnota_api'.
-const API_BASE = (window.AUTOSPILNOTA_API || localStorage.getItem('autospilnota_api') || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const API_BASE = (window.AUTOSPILNOTA_API || localStorage.getItem('autospilnota_api') || 'https://avtospilnota-production.up.railway.app/').replace(/\/$/, '');
 const TOKEN_KEY = 'autospilnota_token';
 // Межа «мобільного» режиму в пікселях. Має збігатися з @media (max-width: 900px) у style.css.
 const MOBILE_MAX = 900;
